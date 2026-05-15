@@ -10,8 +10,8 @@ const services = [
     title: "CNC & Automatisme",
     description:
       "Votre machine est à l'arrêt. Chaque heure perdue grève votre TRS. Nos techniciens interviennent sur site pour diagnostiquer et remettre en service vos commandes numériques, variateurs de vitesse, servomoteurs et broches. Maîtrise avancée des systèmes Siemens Sinumerik, FANUC, NUM, Heidenhain et Schneider.",
-    image:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop",
+    video: "/maintenance-cnc.mp4",
+    image: null,
     imageAlt: "Technicien intervenant sur une armoire électrique industrielle",
     features: [
       "Diagnostic et dépannage sur site",
@@ -29,6 +29,7 @@ const services = [
     title: "Modernisation sans remplacement",
     description:
       "Vos commandes numériques deviennent obsolètes et les pièces de rechange se raréfient. Le rétrofit est la réponse économique : moderniser la partie commande d'une machine en conservant sa mécanique de précision. Nous prenons en charge la migration complète, de l'étude de faisabilité à la remise en production.",
+    video: null,
     image:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
     imageAlt: "Cartes électroniques et composants industriels",
@@ -48,8 +49,8 @@ const services = [
     title: "Pilotage 4.0 de votre parc",
     description:
       "La panne la moins coûteuse est celle qu'on anticipe. Nous connectons vos sources hétérogènes (SCADA, GMAO Carl Source, automates, fichiers Excel) et construisons des tableaux de bord Power BI qui donnent à votre direction de production une visibilité en temps réel sur les temps d'arrêt, le MTTR et le TRS.",
-    image:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    video: null,
+    image: "/supervision-data.png",
     imageAlt: "Tableau de bord analytique Power BI sur écran",
     features: [
       "Tableaux de bord Power BI sur mesure",
@@ -103,13 +104,24 @@ export function Services() {
                     isLeft ? "lg:order-first" : "lg:order-last"
                   }`}
                 >
-                  <Image
-                    src={service.image}
-                    alt={service.imageAlt}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                  {service.video ? (
+                    <video
+                      src={service.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                    />
+                  ) : (
+                    <Image
+                      src={service.image!}
+                      alt={service.imageAlt}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-brand-dark/20 transition-opacity duration-500 group-hover:opacity-10" />
                 </div>
 
