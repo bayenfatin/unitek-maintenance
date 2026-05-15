@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand: oklch(42% 0.135 240);
+  --color-brand-dark: oklch(22% 0.08 240);
+  --color-brand-mid: oklch(55% 0.12 240);
+  --color-brand-light: oklch(96% 0.015 240);
+  --color-surface: oklch(98.5% 0.005 240);
+  --color-foreground: oklch(18% 0.015 240);
+  --color-muted: oklch(60% 0.015 240);
+  --color-border: oklch(90% 0.008 240);
+  --color-urgent: oklch(52% 0.21 25);
+  --color-urgent-dark: oklch(40% 0.19 25);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter, system-ui, sans-serif);
+  background-color: oklch(98.5% 0.005 240);
+  color: oklch(18% 0.015 240);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-space, system-ui, sans-serif);
+  letter-spacing: -0.025em;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────── */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scanDown {
+  0% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(168px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* ── Nav link underline ─────────────────────────────────────────── */
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: oklch(42% 0.135 240);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ── Urgence pulse ring ──────────────────────────────────────────── */
+
+.urgence-pulse {
+  position: relative;
+}
+
+.urgence-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: oklch(52% 0.21 25);
+  animation: pulseRing 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
