@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
 import { Services } from "@/components/home/Services";
 import { Brands } from "@/components/home/Brands";
@@ -8,16 +6,12 @@ import { CtaUrgence } from "@/components/home/CtaUrgence";
 
 export default function HomePage() {
   return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <Services />
-        <Brands />
-        <Data40 />
-        <CtaUrgence />
-      </main>
-      <Footer />
-    </>
+    <main>
+      <Hero />
+      <Services />
+      <Brands />
+      <Data40 />
+      <CtaUrgence />
+    </main>
   );
 }

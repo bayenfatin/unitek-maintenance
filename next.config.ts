@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      {
+        // WordPress headless CMS — remplacer par le vrai hostname WP
+        protocol: "https",
+        hostname: "cms.unitek-automation.fr",
+        pathname: "/**",
+      },
     ],
   },
   turbopack: {
