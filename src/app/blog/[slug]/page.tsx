@@ -1,10 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllSlugs, getPostBySlug } from "@/lib/wpgraphql";
-
-export const revalidate = 3600;
+import { MOCK_POSTS_FULL, MOCK_CARD_META, MOCK_POSTS } from "@/lib/mock-posts";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -12,46 +9,43 @@ type Props = {
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
-export async function generateStaticParams() {
-  const slugs = await getAllSlugs();
-  return slugs.map((slug) => ({ slug }));
+export function generateStaticParams() {
+  return MOCK_POSTS_FULL.map((post) => ({ slug: post.slug }));
 }
 
-// ─── Metadata (Rank Math SEO) ─────────────────────────────────────────────────
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = MOCK_POSTS_FULL.find((p) => p.slug === slug);
 
   if (!post) return { title: "Article introuvable" };
 
   const parentImages = (await parent).openGraph?.images ?? [];
-  const ogImage = post.seo?.openGraph?.ogImage?.url;
 
   return {
-    title: post.seo?.title || post.title,
-    description: post.seo?.description || stripHtml(post.excerpt),
+    title: post.seo?.title ?? post.title,
+    description: post.seo?.description ?? stripHtml(post.excerpt),
     alternates: {
       canonical: post.seo?.canonicalUrl,
     },
     openGraph: {
-      title: post.seo?.openGraph?.title || post.title,
-      description: post.seo?.openGraph?.description || stripHtml(post.excerpt),
+      title: post.seo?.openGraph?.title ?? post.title,
+      description: post.seo?.openGraph?.description ?? stripHtml(post.excerpt),
       url: post.seo?.openGraph?.url ?? post.seo?.canonicalUrl,
       type: "article",
       publishedTime: post.date,
       modifiedTime: post.modified,
       authors: [post.author.node.name],
-      images: ogImage ? [ogImage, ...parentImages] : parentImages,
+      images: parentImages,
     },
     twitter: {
       card: "summary_large_image",
-      title: post.seo?.title || post.title,
-      description: post.seo?.description || stripHtml(post.excerpt),
-      images: ogImage ? [ogImage] : [],
+      title: post.seo?.title ?? post.title,
+      description: post.seo?.description ?? stripHtml(post.excerpt),
     },
   };
 }
@@ -74,17 +68,16 @@ function formatDate(iso: string): string {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = MOCK_POSTS_FULL.find((p) => p.slug === slug);
 
   if (!post) notFound();
 
+  const cardIdx = MOCK_POSTS.findIndex((p) => p.slug === slug);
+  const meta = MOCK_CARD_META[cardIdx] ?? MOCK_CARD_META[0];
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://unitek-automation.fr";
   const postUrl = `${siteUrl}/blog/${post.slug}`;
-  const imageUrl =
-    post.featuredImage?.node.sourceUrl ??
-    post.seo?.openGraph?.ogImage?.url;
 
-  // Schema.org Article JSON-LD
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -96,34 +89,18 @@ export default async function BlogPostPage({ params }: Props) {
     author: {
       "@type": "Person",
       name: post.author.node.name,
-      url: `${siteUrl}/author/${post.author.node.slug}`,
     },
     publisher: {
       "@type": "Organization",
       name: "Unitek Automation",
       url: siteUrl,
-      logo: {
-        "@type": "ImageObject",
-        url: `${siteUrl}/logo.png`,
-      },
+      logo: { "@type": "ImageObject", url: `${siteUrl}/unitek-logo-bleu.png` },
     },
-    ...(imageUrl && {
-      image: {
-        "@type": "ImageObject",
-        url: imageUrl,
-        width: post.featuredImage?.node.mediaDetails?.width ?? 1200,
-        height: post.featuredImage?.node.mediaDetails?.height ?? 630,
-      },
-    }),
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": postUrl,
-    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
   };
 
   return (
     <>
-      {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -131,29 +108,30 @@ export default async function BlogPostPage({ params }: Props) {
         }}
       />
 
-      <main className="min-h-screen bg-[var(--color-surface)]">
-        {/* Hero / Featured Image */}
-        <div className="relative bg-[var(--color-brand-dark)]">
-          {imageUrl && (
-            <div className="absolute inset-0 opacity-20">
-              <Image
-                src={imageUrl}
-                alt={post.featuredImage?.node.altText || post.title}
-                fill
-                priority
-                className="object-cover"
-                sizes="100vw"
-              />
-            </div>
-          )}
-          <div className="relative max-w-3xl mx-auto px-6 pt-28 pb-20 text-center">
+      <main className="min-h-screen bg-surface">
+
+        {/* ── Hero ───────────────────────────────────────────────────────────── */}
+        <div
+          className="relative pt-32 pb-20 px-6 overflow-hidden"
+          style={{ background: meta.gradient }}
+        >
+          {/* Grid texture */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg,transparent,transparent 28px,oklch(100% 0 0 / 0.03) 28px,oklch(100% 0 0 / 0.03) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,oklch(100% 0 0 / 0.03) 28px,oklch(100% 0 0 / 0.03) 29px)",
+            }}
+          />
+
+          <div className="relative max-w-3xl mx-auto text-center">
             {/* Categories */}
             {post.categories.nodes.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
+              <div className="flex flex-wrap justify-center gap-2 mb-5">
                 {post.categories.nodes.map((cat) => (
                   <span
                     key={cat.slug}
-                    className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-white/10 text-white/80"
+                    className="text-xs font-semibold uppercase tracking-widest px-3 py-1 bg-white/15 text-white/90"
                   >
                     {cat.name}
                   </span>
@@ -161,17 +139,23 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             )}
 
-            <h1 className="text-3xl md:text-5xl font-bold text-white font-[var(--font-space)] leading-tight">
+            <h1
+              className="text-3xl md:text-4xl font-bold text-white leading-tight mb-6"
+              style={{
+                fontFamily: "var(--font-space, system-ui, sans-serif)",
+                letterSpacing: "-0.025em",
+              }}
+            >
               {post.title}
             </h1>
 
-            <div className="mt-6 flex items-center justify-center gap-4 text-white/60 text-sm">
+            <div className="flex items-center justify-center gap-3 text-white/60 text-sm flex-wrap">
               <span>{post.author.node.name}</span>
-              <span>·</span>
+              <span aria-hidden>·</span>
               <time dateTime={post.date}>{formatDate(post.date)}</time>
               {post.modified !== post.date && (
                 <>
-                  <span>·</span>
+                  <span aria-hidden>·</span>
                   <span>Mis à jour le {formatDate(post.modified)}</span>
                 </>
               )}
@@ -179,28 +163,35 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Article body */}
+        {/* ── Corps de l'article ─────────────────────────────────────────────── */}
         <article className="max-w-3xl mx-auto px-6 py-14">
+
           <div
-            className="prose prose-slate max-w-none
-              prose-headings:font-[var(--font-space)] prose-headings:text-[var(--color-foreground)]
-              prose-a:text-[var(--color-brand)] prose-a:no-underline hover:prose-a:underline
-              prose-img:rounded-xl prose-img:shadow-sm
-              prose-code:text-[var(--color-brand)] prose-code:bg-[var(--color-brand-light)] prose-code:px-1 prose-code:rounded"
+            className="
+              [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mt-10 [&>h2]:mb-4
+              [&>h2]:text-foreground
+              [&>h3]:text-xl [&>h3]:font-bold [&>h3]:mt-8 [&>h3]:mb-3
+              [&>h3]:text-foreground
+              [&>p]:text-base [&>p]:leading-[1.8] [&>p]:text-muted [&>p]:mb-5
+              [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-6
+              [&>ul>li]:text-muted [&>ul>li]:leading-[1.8] [&>ul>li]:mb-2
+              [&>strong]:text-foreground
+              [&>a]:text-brand [&>a]:underline
+            "
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
           {/* Tags */}
           {post.tags.nodes.length > 0 && (
-            <div className="mt-10 pt-8 border-t border-[var(--color-border)]">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-muted)] mb-3">
-                Tags
+            <div className="mt-10 pt-8 border-t border-border">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted mb-3">
+                Thèmes
               </p>
               <div className="flex flex-wrap gap-2">
                 {post.tags.nodes.map((tag) => (
                   <span
                     key={tag.slug}
-                    className="text-xs px-3 py-1 rounded-full border border-[var(--color-border)] text-[var(--color-muted)]"
+                    className="text-xs px-3 py-1 border border-border text-muted"
                   >
                     {tag.name}
                   </span>
@@ -209,16 +200,17 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           )}
 
-          {/* Back link */}
-          <div className="mt-12">
+          {/* Navigation retour */}
+          <div className="mt-12 pt-8 border-t border-border">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)] transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand hover:text-brand-dark transition-colors"
             >
-              ← Retour au blog
+              ← Retour aux actualités
             </Link>
           </div>
         </article>
+
       </main>
     </>
   );

@@ -29,9 +29,19 @@ const NAV_LINKS = [
     isPage: true,
   },
   {
+    label: "Presses Plastique",
+    href: "/maintenance-presse-injection-plastique",
+    isPage: true,
+  },
+  {
+    label: "Actualités",
+    href: "/blog",
+    isPage: true,
+  },
+  {
     label: "Contact",
-    href: "/#contact",
-    isPage: false,
+    href: "/contact",
+    isPage: true,
   },
 ] as const;
 
@@ -203,17 +213,50 @@ export function Header() {
                 Supervision &amp; Data 4.0
               </Link>
 
+              <Link
+                href="/maintenance-presse-injection-plastique"
+                aria-current={
+                  isActive("/maintenance-presse-injection-plastique") ? "page" : undefined
+                }
+                className={`flex items-center py-3 text-sm border-b border-border transition-colors ${
+                  isActive("/maintenance-presse-injection-plastique")
+                    ? "text-brand font-semibold"
+                    : "font-medium text-foreground"
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                Presses injection &amp; plasturgie
+              </Link>
+
+              <Link
+                href="/blog"
+                aria-current={isActive("/blog") ? "page" : undefined}
+                className={`flex items-center py-3 text-sm border-b border-border transition-colors ${
+                  isActive("/blog")
+                    ? "text-brand font-semibold"
+                    : "font-medium text-foreground"
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                Actualités Industrielles
+              </Link>
+
               {/* Actions */}
               <div className="mt-5 flex flex-col gap-3">
                 <Link
-                  href="/#contact"
-                  className="text-sm font-medium text-muted"
+                  href="/contact"
+                  aria-current={isActive("/contact") ? "page" : undefined}
+                  className={`text-sm transition-colors ${
+                    isActive("/contact")
+                      ? "text-brand font-semibold"
+                      : "font-medium text-muted"
+                  }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   Contact
                 </Link>
                 <Link
-                  href="/#contact"
+                  href="/contact"
                   className="urgence-pulse relative bg-urgent text-white text-sm font-semibold px-4 py-3.5 text-center overflow-hidden"
                   onClick={() => setMenuOpen(false)}
                 >

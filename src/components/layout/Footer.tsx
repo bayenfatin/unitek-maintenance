@@ -24,8 +24,12 @@ const navigation = [
         href: "/retrofit-machine-outil-automate",
       },
       {
+        label: "Presses injection & plasturgie",
+        href: "/maintenance-presse-injection-plastique",
+      },
+      {
         label: "Dépannage urgence 24/7",
-        href: "/#contact",
+        href: "/contact",
       },
     ],
   },
@@ -43,8 +47,8 @@ const navigation = [
     links: [
       { label: "Métallurgie & Usinage",      href: "/#services" },
       { label: "Aéronautique & Automobile",  href: "/#services" },
-      { label: "Chimie & Plasturgie",        href: "/#services" },
-      { label: "Industrie lyonnaise",        href: "/#contact"  },
+      { label: "Chimie & Plasturgie",        href: "/maintenance-presse-injection-plastique" },
+      { label: "Industrie lyonnaise",        href: "/contact"   },
     ],
   },
 ];

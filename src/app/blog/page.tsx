@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { getAllPosts } from "@/lib/wpgraphql";
-
-export const revalidate = 3600;
+import { Search } from "lucide-react";
+import { MOCK_POSTS, MOCK_CARD_META } from "@/lib/mock-posts";
 
 export const metadata: Metadata = {
-  title: "Blog | Unitek Automation",
+  title: "Actualités Industrielles | Unitek Automation",
   description:
-    "Actualités, guides techniques et conseils d'experts en maintenance CNC, rétrofit industriel et automatisation.",
+    "Retours terrain, guides techniques et études de cas en maintenance industrielle, hydraulique, rétrofit IHM et AMDEC.",
 };
 
 function formatDate(iso: string): string {
@@ -23,92 +21,212 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 
-export default async function BlogPage() {
-  const posts = await getAllPosts(12);
+// ─── Card principal ────────────────────────────────────────────────────────────
 
+function ArticleCard({
+  post,
+  meta,
+}: {
+  post: (typeof MOCK_POSTS)[number];
+  meta: (typeof MOCK_CARD_META)[number];
+}) {
   return (
-    <main className="min-h-screen bg-[var(--color-surface)]">
-      {/* Hero */}
-      <section className="bg-[var(--color-brand-dark)] pt-28 pb-16 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-[var(--color-brand-light)] mb-3">
-            Ressources
+    <Link href={`/blog/${post.slug}`} className="group block">
+      <article
+        className="relative overflow-hidden h-[340px] flex flex-col justify-end"
+        style={{ background: meta.gradient }}
+      >
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg,transparent,transparent 28px,oklch(100% 0 0 / 0.03) 28px,oklch(100% 0 0 / 0.03) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,oklch(100% 0 0 / 0.03) 28px,oklch(100% 0 0 / 0.03) 29px)",
+          }}
+        />
+
+        {/* Category badge */}
+        <div className="absolute top-4 left-4 z-10">
+          <span className="inline-block px-3 py-1 text-xs font-semibold bg-white/90 text-foreground">
+            {meta.category}
+          </span>
+        </div>
+
+        {/* Bottom gradient overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, oklch(5% 0.02 240 / 0.92) 0%, oklch(5% 0.02 240 / 0.5) 45%, transparent 75%)",
+          }}
+        />
+
+        {/* Text content */}
+        <div className="relative z-10 p-5">
+          <h2
+            className="text-base font-bold text-white leading-snug mb-2 line-clamp-2 group-hover:opacity-90 transition-opacity"
+            style={{ fontFamily: "var(--font-space, system-ui, sans-serif)" }}
+          >
+            {post.title}
+          </h2>
+          <p className="text-xs text-white/70 line-clamp-2 leading-relaxed">
+            {stripHtml(post.excerpt)}
           </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white font-[var(--font-space)]">
-            Blog technique
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+// ─── Item sidebar ──────────────────────────────────────────────────────────────
+
+function SidebarItem({
+  post,
+  meta,
+}: {
+  post: (typeof MOCK_POSTS)[number];
+  meta: (typeof MOCK_CARD_META)[number];
+}) {
+  return (
+    <Link href={`/blog/${post.slug}`} className="group flex gap-3 items-start">
+      {/* Thumbnail */}
+      <div
+        className="w-[72px] h-[72px] shrink-0"
+        style={{ background: meta.gradient }}
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-muted mb-1">{formatDate(post.date)}</p>
+        <p
+          className="text-sm font-bold leading-snug line-clamp-3 text-foreground group-hover:text-brand transition-colors"
+          style={{ fontFamily: "var(--font-space, system-ui, sans-serif)" }}
+        >
+          {post.title}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function ActualitesPage() {
+  return (
+    <main className="min-h-screen bg-surface">
+
+      {/* ── Hero ─────────────────────────────────────────────────────────────── */}
+      <section className="bg-white pt-32 pb-16 px-6 text-center border-b border-border">
+        <div className="max-w-3xl mx-auto">
+          <span className="inline-block text-xs font-semibold tracking-[0.18em] uppercase px-4 py-1.5 border border-border text-muted mb-6">
+            Actualités Industrielles
+          </span>
+
+          <h1
+            className="text-[clamp(2rem,5vw,3.4rem)] font-bold leading-tight mb-5 text-foreground"
+            style={{ fontFamily: "var(--font-space, system-ui, sans-serif)", letterSpacing: "-0.03em" }}
+          >
+            Retours terrain &amp; guides techniques
           </h1>
-          <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
-            Maintenance CNC, rétrofit, Industrie 4.0 — les experts Unitek partagent leur savoir-faire.
+
+          <p className="text-base text-muted max-w-xl mx-auto mb-10 leading-relaxed">
+            Maintenance hydraulique, AMDEC, rétrofit IHM — les techniciens
+            Unitek partagent leurs méthodes et leurs résultats concrets.
           </p>
+
+          {/* Barre de recherche décorative */}
+          <div className="flex max-w-md mx-auto shadow-sm">
+            <div className="flex-1 flex items-center gap-2 border border-r-0 border-border bg-white px-4">
+              <Search size={15} className="text-muted shrink-0" />
+              <input
+                type="search"
+                placeholder="Rechercher un article..."
+                className="flex-1 text-sm text-foreground placeholder:text-muted outline-none py-3 bg-transparent"
+                readOnly
+              />
+            </div>
+            <button
+              className="px-6 py-3 text-sm font-semibold text-white bg-brand hover:bg-brand-dark transition-colors duration-150 whitespace-nowrap"
+            >
+              Rechercher
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Grid */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        {posts.length === 0 ? (
-          <p className="text-center text-[var(--color-muted)] text-lg">
-            Aucun article publié pour le moment.
-          </p>
-        ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <article
-                key={post.slug}
-                className="group flex flex-col bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                {/* Thumbnail */}
-                <div className="relative aspect-video bg-[var(--color-brand-light)] overflow-hidden">
-                  {post.featuredImage ? (
-                    <Image
-                      src={post.featuredImage.node.sourceUrl}
-                      alt={post.featuredImage.node.altText || post.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-[var(--color-brand)] opacity-30 text-6xl font-bold select-none">
-                        U
-                      </span>
-                    </div>
-                  )}
-                </div>
+      {/* ── Contenu + Sidebar ─────────────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
 
-                {/* Content */}
-                <div className="flex flex-col flex-1 p-5 gap-3">
-                  <time
-                    dateTime={post.date}
-                    className="text-xs text-[var(--color-muted)] font-medium"
-                  >
-                    {formatDate(post.date)}
-                  </time>
+        <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-14 xl:gap-20">
 
-                  <h2 className="text-base font-bold leading-snug text-[var(--color-foreground)] group-hover:text-[var(--color-brand)] transition-colors line-clamp-2 font-[var(--font-space)]">
-                    {post.title}
-                  </h2>
+          {/* ── Grille principale ──────────────────────────────────────────── */}
+          <div>
+            <h2
+              className="text-xl font-bold text-foreground mb-8"
+              style={{ fontFamily: "var(--font-space, system-ui, sans-serif)", letterSpacing: "-0.02em" }}
+            >
+              Les dernières actualités
+            </h2>
 
-                  <p className="text-sm text-[var(--color-muted)] line-clamp-3 flex-1">
-                    {stripHtml(post.excerpt)}
-                  </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {MOCK_POSTS.map((post, i) => (
+                <ArticleCard key={post.slug} post={post} meta={MOCK_CARD_META[i]} />
+              ))}
+            </div>
 
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-[var(--color-muted)]">
-                      {post.author.node.name}
-                    </span>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="text-xs font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)] transition-colors"
-                    >
-                      Lire l&apos;article →
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            ))}
+            {/* Pagination placeholder */}
+            <div className="mt-12 flex justify-center">
+              <span className="text-xs text-muted border border-border px-4 py-2">
+                3 articles — prochains articles disponibles à la connexion WordPress
+              </span>
+            </div>
           </div>
-        )}
+
+          {/* ── Sidebar ───────────────────────────────────────────────────── */}
+          <aside className="mt-14 lg:mt-0">
+
+            {/* À la une */}
+            <div className="mb-10">
+              <div className="flex items-center gap-3 mb-5">
+                <h3
+                  className="text-base font-bold text-foreground"
+                  style={{ fontFamily: "var(--font-space, system-ui, sans-serif)" }}
+                >
+                  À la une
+                </h3>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="space-y-5">
+                {MOCK_POSTS.map((post, i) => (
+                  <SidebarItem key={post.slug} post={post} meta={MOCK_CARD_META[i]} />
+                ))}
+              </div>
+            </div>
+
+            {/* Récentes */}
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <h3
+                  className="text-base font-bold text-foreground"
+                  style={{ fontFamily: "var(--font-space, system-ui, sans-serif)" }}
+                >
+                  Récentes
+                </h3>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="space-y-5">
+                {[...MOCK_POSTS].reverse().map((post, i) => (
+                  <SidebarItem
+                    key={post.slug}
+                    post={post}
+                    meta={MOCK_CARD_META[MOCK_POSTS.length - 1 - i]}
+                  />
+                ))}
+              </div>
+            </div>
+
+          </aside>
+        </div>
       </section>
+
     </main>
   );
 }
