@@ -578,16 +578,10 @@ export default function SupervisionPage() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <a
                       href="#audit"
-                      className="inline-flex items-center justify-center gap-2 font-semibold text-sm px-8 py-4 transition-colors duration-150"
+                      className="inline-flex items-center justify-center gap-2 font-semibold text-sm px-8 py-4 transition-all duration-150 hover:brightness-95"
                       style={{
                         backgroundColor: "oklch(97% 0.005 240)",
                         color: "oklch(18% 0.06 240)",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "oklch(92% 0.01 240)";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "oklch(97% 0.005 240)";
                       }}
                     >
                       Demander un audit gratuit
