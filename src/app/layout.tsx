@@ -22,6 +22,19 @@ export const metadata: Metadata = {
     "Expert en maintenance industrielle, dépannage CNC et rétrofit de machines-outils depuis 30 ans. Siemens Sinumerik, FANUC, NUM, Heidenhain. Région lyonnaise, Saint-Fons.",
   keywords:
     "maintenance CNC, dépannage commande numérique, rétrofit machine-outil, Siemens Sinumerik, FANUC, maintenance 4.0, Lyon, Saint-Fons",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
